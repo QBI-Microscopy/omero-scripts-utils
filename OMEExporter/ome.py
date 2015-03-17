@@ -280,6 +280,7 @@ class OMEBase:
                 s = etree.tostring(xml, encoding='UTF-8', xml_declaration=True)
             print 'ome-xml',etree.tostring(xml,pretty_print=True)
             if (self.sizeX < 4096) and (self.sizeY < 4096):
+                print 'slicesZ',self.slicesZ
                 tif_gen.create_planes(self.sizeX,self.sizeY,self.slicesZ,self.slicesC,self.slicesT,s)
             else:
                 tc = tif_gen.create_tiles(self.sizeX,self.sizeY,self.slicesZ,self.slicesC,self.slicesT,s)
