@@ -4,96 +4,29 @@ import os
 import sys
 from uuid import uuid1 as uuid
 from lxml import etree
-from lxml.builder import ElementMaker
-#from pylibtiff import TIFFimage
 from tifffile import imsave
-try:
-    from libtiff import TIFF
-except:
-    import traceback
-    traceback.print_exc()
-    raw_input('enter to close')
+from libtiff import TIFF
 import numpy as np
 
-namespace_map=dict(bf = "http://www.openmicroscopy.org/Schemas/BinaryFile/2013-06",
-                   ome = "http://www.openmicroscopy.org/Schemas/OME/2013-06",
-                   xsi = "http://www.w3.org/2001/XMLSchema-instance",
-                   roi = "http://www.openmicroscopy.org/Schemas/ROI/2012-06",
-#                    sa = "http://www.openmicroscopy.org/Schemas/SA/2013-06",
-#                    spw = "http://www.openmicroscopy.org/Schemas/SPW/2013-06"
-                   )
-default = {"OME" : "http://www.openmicroscopy.org/Schemas/OME/2013-06"}
-# create element makers: bf, ome, xsi
-default_validate = False
-# if default_validate:
-#     # use this when validating
-#     ome = ElementMaker (namespace = namespace_map['ome'], nsmap = namespace_map) 
-# else:
-#     # use this for creating imagej readable ome.tiff files.
-#     ome = ElementMaker (nsmap = namespace_map) 
-ome = ElementMaker(namespace = namespace_map['ome'], nsmap = namespace_map)
-roi = ElementMaker(namespace = namespace_map['roi']) 
-# bf = ElementMaker (namespace = namespace_map['bf'], nsmap = namespace_map)
-# sa = ElementMaker (namespace = namespace_map['sa'], nsmap = namespace_map)
-# spw = ElementMaker (namespace = namespace_map['spw'], nsmap = namespace_map)
+class ElementBase():
 
-def ATTR(namespace, name, value):
-    return {'{%s}%s' % (namespace_map[namespace], name): value}
-
-def validate_xml(xml):
-    if getattr(sys,'frozen',None):
-        ome_xsd_path = os.path.dirname(sys.executable)
-    elif __file__:  
-        ome_xsd_path = os.path.dirname(__file__)
-        
-    ome_xsd = os.path.join(ome_xsd_path,'ome.xsd')    
-
-    if os.path.isfile (ome_xsd):
-        ome_xsd = os.path.join(namespace_map['ome'],'ome.xsd')
-        f = open (ome_xsd) 
-    else:
-        import urllib2
-        ome_xsd = os.path.join(namespace_map['ome'],'ome.xsd')
-        f = urllib2.urlopen(ome_xsd)
-    sys.stdout.write('Validating XML content against %r...' % (ome_xsd))
-    xmlschema_doc = etree.parse(f)
-    
-    xmlschema = etree.XMLSchema(xmlschema_doc)
-    if isinstance (xml, basestring):
-        xml = etree.parse(xml)
-    result = xmlschema.validate(xml)
-    if not result:
-        sys.stdout.write('FAILED:\n')
-        for error in xmlschema.error_log:
-            s = str (error)
-            for k,v in namespace_map.items():
-                s = s.replace ('{%s}' % v, '%s:' % k)
-        sys.stdout.write('-----\n')
-    else:
-        sys.stdout.write('SUCCESS!\n')
-    return result
-
-class ElementBase:
-
-    def __init__ (self, parent, root, nsn):
+    def __init__ (self, parent, root):
         self.parent = parent
+        print 'parent',parent
         self.root = root
+        print 'root',root
         
         n = self.__class__.__name__
         iter_mth = getattr(parent, 'iter_%s' % (n), None)
-        nm = n
-        if '_' in n:
-            nsn, nm = n.split('_',1)
-            nsn = nsn.lower()
-        ns = eval(nsn)    
-        print 'nsn,nm,ns',nsn,nm,ns
-        ome_el = getattr (ns, nm, None)
-
+        print 'iter_mth',iter_mth
         if iter_mth is not None:
-            for element in iter_mth(ome_el):
-                root.append(element)
+            for element in iter_mth():
+                print getattr(root, 'add_%s' % (n), None)
+                add_element = getattr(root, 'add_%s' % (n), None)
+                print 'element',element
+                add_element(element)
         elif 0:
-            print 'NotImplemented: %s.iter_%s(<%s.%s callable>)' % (parent.__class__.__name__, n, nsn, nm)
+            print 'NotImplemented: %s.iter_%s(<callable>)' % (parent.__class__.__name__, n)
 
 class TiffImageGenerator:
     
@@ -258,27 +191,19 @@ class OMEBase:
     def __init__(self):
         self.tif_images = {}
 
-    def generate(self, options=None, validate=default_validate):
-        template_xml = list(self.make_xml())
+    def generate(self, options=None, validate=False):
+        template_xml = self.make_xml()
         tif_gen = TiffImageGenerator(self.conn,self.source,self.input_dir,self.filename,self.box)
         self.tif_images[self.tif_filename,self.tif_uuid,self.PhysSize] = tif_gen
 
         s = None
         for (fn, uuid, res), tif_gen in self.tif_images.items():
-            xml= ome.OME(ATTR('xsi','schemaLocation',"%s %s/ome.xsd" % ((namespace_map['ome'],)*2)),
-                          UUID = uuid)
-            for item in template_xml:
-
-#                 if item.tag.endswith('Image') and item.get('ID')!='Image:%s' % (detector):
-#                     continue
-                xml.append(item)
                 
             if s is None and validate:
-                s = etree.tostring(xml, encoding='UTF-8', xml_declaration=True)
-                validate_xml(xml)
+                s = etree.tostring(template_xml.to_etree(), encoding='UTF-8', xml_declaration=True)
             else:
-                s = etree.tostring(xml, encoding='UTF-8', xml_declaration=True)
-            print 'ome-xml',etree.tostring(xml,pretty_print=True)
+                s = etree.tostring(template_xml.to_etree(), encoding='UTF-8', xml_declaration=True)
+            print 'ome_template-xml',etree.tostring(template_xml.to_etree(),pretty_print=True)
             if (self.sizeX < 4096) and (self.sizeY < 4096):
                 print 'slicesZ',self.slicesZ
                 tif_gen.create_planes(self.sizeX,self.sizeY,self.slicesZ,self.slicesC,self.slicesT,s)
@@ -294,14 +219,14 @@ class OMEBase:
 
     def make_xml(self):
         self.temp_uuid = self._mk_uuid()
-        xml = ome.OME(ATTR('xsi','schemaLocation',"%s %s/ome.xsd" % ((namespace_map['ome'],)*2)),
-                       UUID = self.temp_uuid)
+        xml = self.store
+        xml.set_UUID(self.temp_uuid)
         for element_cls in self._subelement_classes:
             if element_cls.__name__ == "ROI":
                 nsn = "roi"
             else:
                 nsn = "ome"
-            element_cls(self, xml, nsn) # element_cls should append elements to root
+            element_cls(self, xml) # element_cls should append elements to root
         return xml   
 
     def get_AcquiredDate(self):
