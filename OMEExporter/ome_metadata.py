@@ -97,12 +97,13 @@ class OMEExporter(OMEBase):
             r = ch.getColor().getRed()
             g = ch.getColor().getGreen()
             b = ch.getColor().getBlue()
-            a = ch.getColor().getAlpha()  
-#             colors.append(str((a<<24)+(r<<16)+(g<<8)+(b<<0)))
-            colors.append(str(ch.getColor().getInt()))
+            a = ch.getColor().getAlpha()
+            color = (a<<24)+(r<<16)+(g<<8)+(b<<0) - 2**32/2  
+            colors.append(str())
+#             colors.append(str(ch.getColor().getInt()))
             
         for c in self.slicesC:      
-#             channel_d['Color'] = colors[c]
+            channel_d['Color'] = colors[c]
             channel_d['Name'] = labels[c]
             channel = ome_xml.Channel(ID='Channel:0:%s' % c, **channel_d)
             print 'channel',channel
