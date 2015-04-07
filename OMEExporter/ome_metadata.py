@@ -3,6 +3,9 @@
 import ome_xml
 from ome import OMEBase       
 
+import struct
+import binascii
+
 shapes = {"Rect":ome_xml.Rectangle,"Ellipse":ome_xml.Ellipse,"Polygon":ome_xml.Polyline}
 
 class OMEExporter(OMEBase):
@@ -94,12 +97,13 @@ class OMEExporter(OMEBase):
             print "Name: ", ch.getLabel()   # if no name, get emission wavelength or index
             labels.append(ch.getLabel())
             print "  Color:", ch.getColor().getInt()
-            r = ch.getColor().getRed()
-            g = ch.getColor().getGreen()
-            b = ch.getColor().getBlue()
-            a = ch.getColor().getAlpha()
-            color = (r<<24)|(g<<16)|(b<<8)|(a<<0) - 2**32/2  
-            colors.append(str(ch.getColor().getInt() - (2**32)/2))
+            r = "%0.2X" % int(ch.getColor().getRed())
+            g = "%0.2X" % int(ch.getColor().getGreen())
+            b = "%0.2X" % int(ch.getColor().getBlue())
+            a = "%0.2X" % int(ch.getColor().getAlpha())
+#             color = (r<<24)|(g<<16)|(b<<8)|(a<<0) - 2**32/2  
+            color = r+g+b+a
+            colors.append(color)
 #             colors.append(str(ch.getColor().getInt()))
             
         for c in self.slicesC:      
