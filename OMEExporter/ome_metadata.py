@@ -98,7 +98,8 @@ class OMEExporter(OMEBase):
             g = ch.getColor().getGreen()
             b = ch.getColor().getBlue()
             a = ch.getColor().getAlpha()  
-            colors.append(str((a<<24)+(r<<16)+(g<<8)+(b<<0)))
+#             colors.append(str((a<<24)+(r<<16)+(g<<8)+(b<<0)))
+            colors.append(str(ch.getColor().getInt()))
             
         for c in self.slicesC:      
             channel_d['Color'] = colors[c]
