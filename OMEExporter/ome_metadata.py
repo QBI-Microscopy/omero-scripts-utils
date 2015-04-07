@@ -58,9 +58,9 @@ class OMEExporter(OMEBase):
                 self.ROI = ROI
                 self.roi_count = len(ROI)
                 
-            self.Xres = source.getPrimaryPixels().getPhysicalSizeX()
-            self.Yres = source.getPrimaryPixels().getPhysicalSizeY()
-            self.Zres = source.getPrimaryPixels().getPhysicalSizeZ()
+            self.Xres = source.getPrimaryPixels().getPhysicalSizeX().getValue()
+            self.Yres = source.getPrimaryPixels().getPhysicalSizeY().getValue()
+            self.Zres = source.getPrimaryPixels().getPhysicalSizeZ().getValue()
             print 'xres,yres,zres:',self.Xres,self.Yres,self.Zres
             self.dtype = source.getPixelsType()
             print 'dtype',type(self.dtype)
