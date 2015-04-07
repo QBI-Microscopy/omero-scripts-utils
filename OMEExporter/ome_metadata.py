@@ -96,14 +96,18 @@ class OMEExporter(OMEBase):
         for c,ch in enumerate(self.source.getChannels()):
             print "Name: ", ch.getLabel()   # if no name, get emission wavelength or index
             labels.append(ch.getLabel())
-            print "  Color:", ch.getColor().getInt()
             r = "%0.2X" % int(ch.getColor().getRed())
+            print "r:", r
             g = "%0.2X" % int(ch.getColor().getGreen())
+            print "g:", r
             b = "%0.2X" % int(ch.getColor().getBlue())
+            print "b:", r
             a = "%0.2X" % int(ch.getColor().getAlpha())
+            print "a:", r
 #             color = (r<<24)|(g<<16)|(b<<8)|(a<<0) - 2**32/2  
             color = r+g+b+a
-            colors.append(color)
+            print "color:",color
+            colors.append(struct.unpack('!i', binascii.unhexlify(color))[0])
 #             colors.append(str(ch.getColor().getInt()))
             
         for c in self.slicesC:      
