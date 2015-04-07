@@ -98,8 +98,8 @@ class OMEExporter(OMEBase):
             g = ch.getColor().getGreen()
             b = ch.getColor().getBlue()
             a = ch.getColor().getAlpha()
-            color = (a<<24)+(r<<16)+(g<<8)+(b<<0) - 2**32/2  
-            colors.append(str())
+            color = (r<<24)+(g<<16)+(b<<8)+(a<<0) - 2**32/2  
+            colors.append(str(color))
 #             colors.append(str(ch.getColor().getInt()))
             
         for c in self.slicesC:      
