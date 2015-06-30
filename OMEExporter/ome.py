@@ -105,10 +105,10 @@ class TiffImageGenerator:
 #                     tif_image.tile_image_params(sizeX,sizeY,1,tileWidth,tileHeight,'lzw')
             
             for tileOffsetY in range(
-                    0, ((sizeY + tileHeight - 1) / tileHeight)):
+                    0, int((sizeY + tileHeight - 1) / tileHeight)):
     
                 for tileOffsetX in range(
-                        0, ((sizeX + tileWidth - 1) / tileWidth)):
+                        0, int((sizeX + tileWidth - 1) / tileWidth)):
     
                     x = tileOffsetX * tileWidth
                     y = tileOffsetY * tileHeight
