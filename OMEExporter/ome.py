@@ -56,7 +56,7 @@ class TiffImageGenerator:
         tileWidth = 1024.0
         tileHeight = 1024.0
         primary_pixels = self.source.getPrimaryPixels()
-    
+        print "sizeX,sizeY in create_tiles: ",sizeX,sizeY
         # Make a list of all the tiles we're going to need.
         zctTileList = []
         for z in slicesZ:
