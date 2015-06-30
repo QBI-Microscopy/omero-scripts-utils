@@ -83,7 +83,7 @@ class TiffImageGenerator:
                                 if (x > self.source.getSizeX()):
                                     x =  self.source.getSizeX()
                                     w = 0.0
-                                 if (y > self.source.getSizeY()):
+                                if (y > self.source.getSizeY()):
                                     y =  self.source.getSizeY()
                                     h = 0.0
                                 if (w + x > self.source.getSizeX()):
