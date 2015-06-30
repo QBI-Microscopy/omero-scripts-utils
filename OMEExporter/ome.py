@@ -75,6 +75,7 @@ class TiffImageGenerator:
                             if (h + y > sizeY):
                                 h = sizeY - y
                             if self.box:
+                                print "type(sizeX),type(sizeY): ",type(sizeX),type(sizeY)
                                 print "box: ",self.box
                                 tile_xywh = (self.box[0] + x, self.box[1] + y, w, h)
                             else:
