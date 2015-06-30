@@ -80,9 +80,9 @@ class TiffImageGenerator:
                                 x = self.box[0] + x
                                 y = self.box[1] + y
                                 # check that the box isn't over the edge of the image
-                                if (x > self.source.getSizeX()):
+                                if (w + x > self.source.getSizeX()):
                                     w = x - self.source.getSizeX()
-                                if (y > self.source.getSizeY()):
+                                if (h + y > self.source.getSizeY()):
                                     h = y - self.source.getSizeY()
                                     
                             tile_xywh = (x, y, w, h)
