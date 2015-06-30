@@ -96,7 +96,7 @@ class TiffImageGenerator:
         tif_image = TIFF.open(os.path.join(self.input_dir,self.filename), 'w')
         print 'description:',description
         for p in range(planes):
-            self.set_tags(tif_image,sizeX,sizeY,tileWidth,tileHeight)
+            self.set_tags(tif_image,int(sizeX),int(sizeY),tileWidth,tileHeight)
             if p == 0:
                 tif_image.set_description(description) 
 
