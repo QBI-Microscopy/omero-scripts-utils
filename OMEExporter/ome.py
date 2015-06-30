@@ -53,8 +53,8 @@ class TiffImageGenerator:
         
     def create_tiles(self,sizeX,sizeY,slicesZ,slicesC,slicesT,description):    
 
-        tileWidth = 1024
-        tileHeight = 1024
+        tileWidth = 1024.0
+        tileHeight = 1024.0
         primary_pixels = self.source.getPrimaryPixels()
     
         # Make a list of all the tiles we're going to need.
@@ -96,7 +96,7 @@ class TiffImageGenerator:
         tif_image = TIFF.open(os.path.join(self.input_dir,self.filename), 'w')
         print 'description:',description
         for p in range(planes):
-            self.set_tags(tif_image,int(sizeX),int(sizeY),tileWidth,tileHeight)
+            self.set_tags(tif_image,int(sizeX),int(sizeY),int(tileWidth),int(tileHeight))
             if p == 0:
                 tif_image.set_description(description) 
 
