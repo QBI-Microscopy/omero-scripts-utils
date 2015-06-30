@@ -127,9 +127,9 @@ class TiffImageGenerator:
                         h = tile_data.shape[0]
                         w = tile_data.shape[1]
                     tile_dtype = tile_data.dtype
-                    tile = np.zeros((1,tileWidth,tileHeight),dtype=tile_dtype)
-                    tile[0,:h,:w] = tile_data[:,:]                     
-                    tif_image.write_tile(tile,x,y)
+                    tile = np.zeros((1,int(tileWidth),int(tileHeight)),dtype=tile_dtype)
+                    tile[0,:int(h),:int(w)] = tile_data[:,:]                     
+                    tif_image.write_tile(tile,int(x),int(y))
             tif_image.WriteDirectory()
         tif_image.close()
         return tile_count
