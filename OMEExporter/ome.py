@@ -75,9 +75,11 @@ class TiffImageGenerator:
                             if (h + y > sizeY):
                                 h = sizeY - y
                             if self.box:
+                                print "box: ",self.box
                                 tile_xywh = (self.box[0] + x, self.box[1] + y, w, h)
                             else:
                                 tile_xywh = (x, y, w, h)
+                            print "(z, c, t, tile_xywh): ", (z, c, t, tile_xywh)
                             zctTileList.append((z, c, t, tile_xywh))
     
         # This is a generator that will return tiles in the sequence above
