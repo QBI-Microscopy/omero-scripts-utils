@@ -20,11 +20,11 @@ class OMEExporter(OMEBase):
         self.box = box
         if source:
             if box:
-                self.sizeX = int(box[2])
-                self.sizeY = int(box[3])
+                self.sizeX = float(box[2])
+                self.sizeY = float(box[3])
             else:
-                self.sizeX = int(source.getSizeX())
-                self.sizeY = int(source.getSizeY())
+                self.sizeX = float(source.getSizeX())
+                self.sizeY = float(source.getSizeY())
             if theZ is not None:
                 if isinstance(theZ,list):
                     self.sizeZ = len(theZ)
