@@ -12,18 +12,13 @@ class ElementBase():
 
     def __init__ (self, parent, root):
         self.parent = parent
-        print 'parent',parent
         self.root = root
-        print 'root',root
         
         n = self.__class__.__name__
         iter_mth = getattr(parent, 'iter_%s' % (n), None)
-        print 'iter_mth',iter_mth
         if iter_mth is not None:
             for element in iter_mth():
-                print getattr(root, 'add_%s' % (n), None)
                 add_element = getattr(root, 'add_%s' % (n), None)
-                print 'element',element
                 add_element(element)
         elif 0:
             print 'NotImplemented: %s.iter_%s(<callable>)' % (parent.__class__.__name__, n)
@@ -56,7 +51,6 @@ class TiffImageGenerator:
         tileWidth = 1024.0
         tileHeight = 1024.0
         primary_pixels = self.source.getPrimaryPixels()
-        print "sizeX,sizeY in create_tiles: ",sizeX,sizeY
         # Make a list of all the tiles we're going to need.
         zctTileList = []
         for z in slicesZ:
@@ -75,24 +69,10 @@ class TiffImageGenerator:
                             if (h + y > sizeY):
                                 h = sizeY - y
                             if self.box:
-                                print "type(sizeX),type(sizeY): ",type(sizeX),type(sizeY)
-                                print "box: ",self.box
                                 x = self.box[0] + x
                                 y = self.box[1] + y
-                                # check that the box isn't over the edge of the image
-                                if (x > self.source.getSizeX()):
-                                    x =  self.source.getSizeX()
-                                    w = 0.0
-                                if (y > self.source.getSizeY()):
-                                    y =  self.source.getSizeY()
-                                    h = 0.0
-                                if (w + x > self.source.getSizeX()):
-                                    w = self.source.getSizeX() - x
-                                if (h + y > self.source.getSizeY()):
-                                    h = self.source.getSizeY() - y
                                     
                             tile_xywh = (x, y, w, h)
-                            print "(z, c, t, tile_xywh): ", (z, c, t, tile_xywh)
                             zctTileList.append((z, c, t, tile_xywh))
     
         # This is a generator that will return tiles in the sequence above
@@ -106,7 +86,6 @@ class TiffImageGenerator:
         tile_count = 0
         planes = len(slicesZ) * len(slicesC) * len(slicesT)
         tif_image = TIFF.open(os.path.join(self.input_dir,self.filename), 'w')
-        print 'description:',description
         for p in range(planes):
             self.set_tags(tif_image,int(sizeX),int(sizeY),int(tileWidth),int(tileHeight))
             if p == 0:
@@ -149,7 +128,6 @@ class TiffImageGenerator:
     def create_planes(self,sizeX,sizeY,slicesZ,slicesC,slicesT,description):
         sizeZ = len(slicesZ)
         sizeC = len(slicesC)
-        print 'sizeC',sizeC
         sizeT = len(slicesT)
         if self.box:
             roi = self.box[:-1]
@@ -174,7 +152,6 @@ class TiffImageGenerator:
     
         p = 0
         image_data = np.zeros((sizeZ,sizeC,sizeT,sizeY,sizeX),dtype=self.dtype)
-        print('image data shape:',image_data.shape)
         for z in range(sizeZ):
             for c in range(sizeC):
                 for t in range(sizeT):
@@ -218,14 +195,10 @@ class OMEBase:
                 s = etree.tostring(template_xml.to_etree(), encoding='UTF-8', xml_declaration=True)
             else:
                 s = etree.tostring(template_xml.to_etree(), encoding='UTF-8', xml_declaration=True)
-            print 'ome_template-xml',etree.tostring(template_xml.to_etree(),pretty_print=True)
             if (self.sizeX < 4096) and (self.sizeY < 4096):
-                print 'slicesZ',self.slicesZ
                 tif_gen.create_planes(self.sizeX,self.sizeY,self.slicesZ,self.slicesC,self.slicesT,s)
             else:
                 tc = tif_gen.create_tiles(self.sizeX,self.sizeY,self.slicesZ,self.slicesC,self.slicesT,s)
-                print 'tile count=',tc
-            print 'SUCCESS!'
 
         return s
 
