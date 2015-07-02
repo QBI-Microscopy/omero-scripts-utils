@@ -64,9 +64,7 @@ class OMEExporter(OMEBase):
             self.Xres = source.getPrimaryPixels().physicalSizeX.getValue()
             self.Yres = source.getPrimaryPixels().physicalSizeY.getValue()
             self.Zres = source.getPrimaryPixels().physicalSizeZ.getValue()
-            print 'xres,yres,zres:',self.Xres,self.Yres,self.Zres
             self.dtype = source.getPixelsType()
-            print 'dtype',type(self.dtype)
             self.date = str(source.getDate())
         
     def iter_Image(self):
@@ -83,8 +81,6 @@ class OMEExporter(OMEBase):
 
         self.tif_uuid = self._mk_uuid()
         self.tif_filename = self.filename  
-        print 'tif_filename',self.tif_filename       
-        print 'sizeZ,sizeC,sizeT',self.sizeZ,self.sizeC,self.sizeT
         pixels = ome_xml.Pixels(
                     DimensionOrder=order, ID='Pixels:0',
                     SizeX = str(self.sizeX), SizeY = str(self.sizeY), SizeZ = str(self.sizeZ), 
@@ -94,7 +90,6 @@ class OMEExporter(OMEBase):
         colors = []
         labels = []
         for c,ch in enumerate(self.source.getChannels()):
-            print "Name: ", ch.getLabel()   # if no name, get emission wavelength or index
             labels.append(ch.getLabel())
             r = "%0.2X" % int(ch.getColor().getRed())
             g = "%0.2X" % int(ch.getColor().getGreen())
@@ -108,17 +103,14 @@ class OMEExporter(OMEBase):
             channel_d['Color'] = colors[c]
             channel_d['Name'] = labels[c]
             channel = ome_xml.Channel(ID='Channel:0:%s' % c, **channel_d)
-            print 'channel',channel
             lpath = ome_xml.LightPath(*lpath_l)
             channel.set_LightPath(lpath)
             pixels.insert_Channel_at(c,channel)
-            print 'pixels',pixels
 
         IFD = 0
         for z in range(self.sizeZ):    
             for c in range(self.sizeC): 
-                for t in range(self.sizeT):  
-                    print 'c',c 
+                for t in range(self.sizeT):
                     d = dict(IFD=str(IFD),FirstC=str(c), FirstZ=str(z),FirstT=str(t), PlaneCount='1')            
                     tiffdata = ome_xml.TiffData(UUID=ome_xml.UUIDType(FileName=self.tif_filename, valueOf_='urn:uuid:%s' % (self.tif_uuid)), **d)
                     pixels.insert_TiffData_at(IFD,tiffdata)   

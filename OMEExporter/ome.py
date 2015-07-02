@@ -203,13 +203,10 @@ class OMEBase:
                 s = etree.tostring(template_xml.to_etree(), encoding='UTF-8', xml_declaration=True)
             else:
                 s = etree.tostring(template_xml.to_etree(), encoding='UTF-8', xml_declaration=True)
-            print 'ome_template-xml',etree.tostring(template_xml.to_etree(),pretty_print=True)
             if (self.sizeX < 4096) and (self.sizeY < 4096):
-                print 'slicesZ',self.slicesZ
                 tif_gen.create_planes(self.sizeX,self.sizeY,self.slicesZ,self.slicesC,self.slicesT,s)
             else:
                 tc = tif_gen.create_tiles(self.sizeX,self.sizeY,self.slicesZ,self.slicesC,self.slicesT,s)
-                print 'tile count=',tc
             print 'SUCCESS!'
 
         return s
