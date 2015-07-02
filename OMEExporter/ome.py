@@ -12,13 +12,18 @@ class ElementBase():
 
     def __init__ (self, parent, root):
         self.parent = parent
+        print 'parent',parent
         self.root = root
+        print 'root',root
         
         n = self.__class__.__name__
         iter_mth = getattr(parent, 'iter_%s' % (n), None)
+        print 'iter_mth',iter_mth
         if iter_mth is not None:
             for element in iter_mth():
+                print getattr(root, 'add_%s' % (n), None)
                 add_element = getattr(root, 'add_%s' % (n), None)
+                print 'element',element
                 add_element(element)
         elif 0:
             print 'NotImplemented: %s.iter_%s(<callable>)' % (parent.__class__.__name__, n)
@@ -48,9 +53,10 @@ class TiffImageGenerator:
         
     def create_tiles(self,sizeX,sizeY,slicesZ,slicesC,slicesT,description):    
 
-        tileWidth = 1024.0
-        tileHeight = 1024.0
+        tileWidth = 1024
+        tileHeight = 1024
         primary_pixels = self.source.getPrimaryPixels()
+    
         # Make a list of all the tiles we're going to need.
         zctTileList = []
         for z in slicesZ:
@@ -69,10 +75,9 @@ class TiffImageGenerator:
                             if (h + y > sizeY):
                                 h = sizeY - y
                             if self.box:
-                                x = self.box[0] + x
-                                y = self.box[1] + y
-                                    
-                            tile_xywh = (x, y, w, h)
+                                tile_xywh = (self.box[0] + x, self.box[1] + y, w, h)
+                            else:
+                                tile_xywh = (x, y, w, h)
                             zctTileList.append((z, c, t, tile_xywh))
     
         # This is a generator that will return tiles in the sequence above
@@ -86,8 +91,9 @@ class TiffImageGenerator:
         tile_count = 0
         planes = len(slicesZ) * len(slicesC) * len(slicesT)
         tif_image = TIFF.open(os.path.join(self.input_dir,self.filename), 'w')
+        print 'description:',description
         for p in range(planes):
-            self.set_tags(tif_image,int(sizeX),int(sizeY),int(tileWidth),int(tileHeight))
+            self.set_tags(tif_image,sizeX,sizeY,tileWidth,tileHeight)
             if p == 0:
                 tif_image.set_description(description) 
 
@@ -96,10 +102,10 @@ class TiffImageGenerator:
 #                     tif_image.tile_image_params(sizeX,sizeY,1,tileWidth,tileHeight,'lzw')
             
             for tileOffsetY in range(
-                    0, int((sizeY + tileHeight - 1) / tileHeight)):
+                    0, ((sizeY + tileHeight - 1) / tileHeight)):
     
                 for tileOffsetX in range(
-                        0, int((sizeX + tileWidth - 1) / tileWidth)):
+                        0, ((sizeX + tileWidth - 1) / tileWidth)):
     
                     x = tileOffsetX * tileWidth
                     y = tileOffsetY * tileHeight
@@ -118,9 +124,9 @@ class TiffImageGenerator:
                         h = tile_data.shape[0]
                         w = tile_data.shape[1]
                     tile_dtype = tile_data.dtype
-                    tile = np.zeros((1,int(tileWidth),int(tileHeight)),dtype=tile_dtype)
-                    tile[0,:int(h),:int(w)] = tile_data[:,:]                     
-                    tif_image.write_tile(tile,int(x),int(y))
+                    tile = np.zeros((1,tileWidth,tileHeight),dtype=tile_dtype)
+                    tile[0,:h,:w] = tile_data[:,:]                     
+                    tif_image.write_tile(tile,x,y)
             tif_image.WriteDirectory()
         tif_image.close()
         return tile_count
@@ -128,6 +134,7 @@ class TiffImageGenerator:
     def create_planes(self,sizeX,sizeY,slicesZ,slicesC,slicesT,description):
         sizeZ = len(slicesZ)
         sizeC = len(slicesC)
+        print 'sizeC',sizeC
         sizeT = len(slicesT)
         if self.box:
             roi = self.box[:-1]
@@ -152,6 +159,7 @@ class TiffImageGenerator:
     
         p = 0
         image_data = np.zeros((sizeZ,sizeC,sizeT,sizeY,sizeX),dtype=self.dtype)
+        print('image data shape:',image_data.shape)
         for z in range(sizeZ):
             for c in range(sizeC):
                 for t in range(sizeT):
@@ -195,10 +203,14 @@ class OMEBase:
                 s = etree.tostring(template_xml.to_etree(), encoding='UTF-8', xml_declaration=True)
             else:
                 s = etree.tostring(template_xml.to_etree(), encoding='UTF-8', xml_declaration=True)
+            print 'ome_template-xml',etree.tostring(template_xml.to_etree(),pretty_print=True)
             if (self.sizeX < 4096) and (self.sizeY < 4096):
+                print 'slicesZ',self.slicesZ
                 tif_gen.create_planes(self.sizeX,self.sizeY,self.slicesZ,self.slicesC,self.slicesT,s)
             else:
                 tc = tif_gen.create_tiles(self.sizeX,self.sizeY,self.slicesZ,self.slicesC,self.slicesT,s)
+                print 'tile count=',tc
+            print 'SUCCESS!'
 
         return s
 
