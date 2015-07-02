@@ -12,18 +12,13 @@ class ElementBase():
 
     def __init__ (self, parent, root):
         self.parent = parent
-        print 'parent',parent
         self.root = root
-        print 'root',root
         
         n = self.__class__.__name__
         iter_mth = getattr(parent, 'iter_%s' % (n), None)
-        print 'iter_mth',iter_mth
         if iter_mth is not None:
             for element in iter_mth():
-                print getattr(root, 'add_%s' % (n), None)
                 add_element = getattr(root, 'add_%s' % (n), None)
-                print 'element',element
                 add_element(element)
         elif 0:
             print 'NotImplemented: %s.iter_%s(<callable>)' % (parent.__class__.__name__, n)
@@ -91,7 +86,6 @@ class TiffImageGenerator:
         tile_count = 0
         planes = len(slicesZ) * len(slicesC) * len(slicesT)
         tif_image = TIFF.open(os.path.join(self.input_dir,self.filename), 'w')
-        print 'description:',description
         for p in range(planes):
             self.set_tags(tif_image,sizeX,sizeY,tileWidth,tileHeight)
             if p == 0:
@@ -134,7 +128,6 @@ class TiffImageGenerator:
     def create_planes(self,sizeX,sizeY,slicesZ,slicesC,slicesT,description):
         sizeZ = len(slicesZ)
         sizeC = len(slicesC)
-        print 'sizeC',sizeC
         sizeT = len(slicesT)
         if self.box:
             roi = self.box[:-1]
@@ -159,7 +152,6 @@ class TiffImageGenerator:
     
         p = 0
         image_data = np.zeros((sizeZ,sizeC,sizeT,sizeY,sizeX),dtype=self.dtype)
-        print('image data shape:',image_data.shape)
         for z in range(sizeZ):
             for c in range(sizeC):
                 for t in range(sizeT):
