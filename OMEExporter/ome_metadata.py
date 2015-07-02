@@ -36,7 +36,6 @@ class OMEExporter(OMEBase):
                 self.sizeZ = int(source.getSizeZ())
                 self.slicesZ = range(self.sizeZ)
             if theC is not None:
-                print "theC",theC
                 if isinstance(theC,list):
                     self.sizeC = len(theC)
                     self.slicesC = theC
@@ -46,6 +45,8 @@ class OMEExporter(OMEBase):
             else:
                 self.sizeC = int(source.getSizeC())
                 self.slicesC = range(self.sizeC)
+                print "sizeC",self.sizeC
+                print "slicesC",self.slicesC
             if theT is not None:
                 if isinstance(theT,list):
                     self.sizeT = len(theT)
