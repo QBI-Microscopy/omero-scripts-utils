@@ -36,6 +36,7 @@ class OMEExporter(OMEBase):
                 self.sizeZ = int(source.getSizeZ())
                 self.slicesZ = range(self.sizeZ)
             if theC is not None:
+                print "theC",theC
                 if isinstance(theC,list):
                     self.sizeC = len(theC)
                     self.slicesC = theC
@@ -64,6 +65,7 @@ class OMEExporter(OMEBase):
             self.Xres = source.getPrimaryPixels().physicalSizeX.getValue()
             self.Yres = source.getPrimaryPixels().physicalSizeY.getValue()
             self.Zres = source.getPrimaryPixels().physicalSizeZ.getValue()
+            print "Xres,Yres,Zres",self.Xres,self.Yres,self.Zres
             self.dtype = source.getPixelsType()
             self.date = str(source.getDate())
         
