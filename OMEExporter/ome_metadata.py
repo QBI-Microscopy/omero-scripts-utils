@@ -20,11 +20,11 @@ class OMEExporter(OMEBase):
         self.box = box
         if source:
             if box:
-                self.sizeX = float(box[2])
-                self.sizeY = float(box[3])
+                self.sizeX = int(box[2])
+                self.sizeY = int(box[3])
             else:
-                self.sizeX = float(source.getSizeX())
-                self.sizeY = float(source.getSizeY())
+                self.sizeX = int(source.getSizeX())
+                self.sizeY = int(source.getSizeY())
             if theZ is not None:
                 if isinstance(theZ,list):
                     self.sizeZ = len(theZ)
@@ -80,7 +80,7 @@ class OMEExporter(OMEBase):
         lpath_l = []
 
         self.tif_uuid = self._mk_uuid()
-        self.tif_filename = self.filename 
+        self.tif_filename = self.filename  
         pixels = ome_xml.Pixels(
                     DimensionOrder=order, ID='Pixels:0',
                     SizeX = str(self.sizeX), SizeY = str(self.sizeY), SizeZ = str(self.sizeZ), 
@@ -110,7 +110,7 @@ class OMEExporter(OMEBase):
         IFD = 0
         for z in range(self.sizeZ):    
             for c in range(self.sizeC): 
-                for t in range(self.sizeT): 
+                for t in range(self.sizeT):
                     d = dict(IFD=str(IFD),FirstC=str(c), FirstZ=str(z),FirstT=str(t), PlaneCount='1')            
                     tiffdata = ome_xml.TiffData(UUID=ome_xml.UUIDType(FileName=self.tif_filename, valueOf_='urn:uuid:%s' % (self.tif_uuid)), **d)
                     pixels.insert_TiffData_at(IFD,tiffdata)   
