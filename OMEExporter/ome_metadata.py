@@ -6,7 +6,7 @@ from ome import OMEBase
 import struct
 import binascii
 
-shapes = {"Rect":ome_xml.Rectangle,"Ellipse":ome_xml.Ellipse,"Polygon":ome_xml.Polyline}
+shapes = {"Rect":ome_xml.Rectangle,"Rectangle":ome_xml.Rectangle,"Ellipse":ome_xml.Ellipse,"Polygon":ome_xml.Polyline}
 
 class OMEExporter(OMEBase):
 
